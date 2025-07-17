@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Word Analyzer</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Website Word Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Website Word Analyzer</h1>
-        <input type="text" id="url" placeholder="Enter website URL" />
-        <input type="number" id="top_n" placeholder="Top N words" value="5" />
-        <button onclick="analyze()">Analyze</button>
-        <div id="results"></div>
-    </div>
-    <script src="script.js"></script>
+  <div class="container">
+    <h1>Website Word Analyzer</h1>
+    <input type="text" id="url" placeholder="Enter website URL (include https://)" />
+    <input type="number" id="top_n" value="5" min="1" max="50" placeholder="Top N words" />
+    <button onclick="analyze()">Analyze</button>
+    <div id="results"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
