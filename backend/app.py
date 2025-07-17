@@ -8,6 +8,18 @@ import re
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+# Common English stopwords to ignore (you can add more as needed)
+STOPWORDS = {
+    'the', 'and', 'is', 'in', 'to', 'of', 'a', 'for', 'on', 'with', 'as', 'by',
+    'at', 'an', 'be', 'this', 'that', 'from', 'or', 'are', 'it', 'was', 'but',
+    'not', 'have', 'has', 'they', 'you', 'we', 'he', 'she', 'his', 'her', 'them',
+    'their', 'which', 'will', 'can', 'all', 'do', 'if', 'so', 'about', 'what',
+    'when', 'where', 'who', 'how', 'why', 'may', 'also', 'than', 'these', 'such',
+    'there', 'some', 'no', 'into', 'more', 'up', 'out', 'would', 'should', 'could',
+    'each', 'other', 'only', 'any', 'like', 'over', 'after', 'before', 'most',
+    'just', 'get', 'because', 'then', 'now', 'very'
+}
+
 def fetch_text_from_url(url):
     try:
         response = requests.get(url)
@@ -39,7 +51,11 @@ def analyze():
     text = fetch_text_from_url(url)
     sentences = re.split(r'[.!?]', text)
     words = re.findall(r'\b\w+\b', text.lower())
-    count = Counter(words)
+
+    # Filter out stopwords
+    filtered_words = [w for w in words if w not in STOPWORDS and len(w) > 2]
+
+    count = Counter(filtered_words)
     most_common = count.most_common(top_n)
 
     result = []
