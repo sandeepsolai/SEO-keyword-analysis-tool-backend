@@ -6,7 +6,7 @@ from collections import Counter
 import re
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Enable CORS for all routes
 
 def fetch_text_from_url(url):
     try:
@@ -53,3 +53,7 @@ def analyze():
         })
 
     return jsonify(result)
+
+@app.route('/', methods=['GET'])
+def home():
+    return 'SEO Keyword Analyzer Backend Running', 200
