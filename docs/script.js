@@ -2,7 +2,7 @@ async function analyze() {
   const url = document.getElementById('url').value;
   const top_n = parseInt(document.getElementById('top_n').value);
 
-  const response = await fetch("https://seo-keyword-analysis.onrender.com", {
+  const response = await fetch("https://seo-keyword-analysis.onrender.com/analyze", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
