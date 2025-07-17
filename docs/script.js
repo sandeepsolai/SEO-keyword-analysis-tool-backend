@@ -4,7 +4,7 @@ async function analyze() {
     const resultDiv = document.getElementById("result");
     resultDiv.innerText = "Analyzing...";
 
-    const response = await fetch("http://localhost:5000/analyze", {
+    const response = await fetch("https://seo-keyword-analysis.onrender.com", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
