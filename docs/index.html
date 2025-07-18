@@ -3,18 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Website Word Analyzer</title>
+  <title>SEO Word Analyzer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Website Word Analyzer</h1>
-    <input type="text" id="url" placeholder="Enter website URL (include https://)" />
-    <input type="number" id="top_n" value="5" min="1" max="50" placeholder="Top N words" />
-    <button onclick="analyze()">Analyze</button>
-    <div id="results"></div>
+    <header class="app-header">
+      <!-- Logo placeholder - initially hidden -->
+      <div class="logo-container" id="logoContainer" style="display: none;">
+        <img id="toolLogo" src="" alt="Tool Logo" class="logo-img" />
+        <h1 id="toolName" class="logo-title"></h1>
+      </div>
+      <!-- Default header shown when no logo provided -->
+      <div id="defaultHeader">
+        <h1>SEO Word Analyzer</h1>
+        <p>Analyze website content to discover the most used words with context</p>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <div class="input-group">
+        <div class="input-field">
+          <label for="url"><i class="fas fa-link"></i> Website URL</label>
+          <input type="text" id="url" placeholder="https://example.com" />
+        </div>
+        <div class="input-field" style="max-width: 150px;">
+          <label for="top_n"><i class="fas fa-chart-bar"></i> Top Words</label>
+          <input type="number" id="top_n" value="10" min="1" max="50" />
+        </div>
+      </div>
+
+      <button id="analyzeBtn" class="btn btn-block">
+        <i class="fas fa-search"></i> Analyze Website
+      </button>
+
+      <div id="results">
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <h3>No Analysis Yet</h3>
+          <p>Enter a website URL and click "Analyze" to see word usage statistics</p>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the analyze button
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.addEventListener('click', analyze);
+      
+      // Make the URL input respond to Enter key
+      document.getElementById('url').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          analyze();
+        }
+      });
+    });
+
+    function analyze() {
+      const url = document.getElementById('url').value.trim();
+      const topN = document.getElementById('top_n').value;
+      
+      if (!url) {
+        showError('Please enter a valid website URL');
+        return;
+      }
+
+      // Validate URL format
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showError('Please include http:// or https:// in the URL');
+        return;
+      }
+
+      // Show loading state
+      document.getElementById('results').innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Analyzing website content...</p>
+        </div>
+      `;
+
+      // Call your existing analyze function from script.js
+      if (typeof window.analyze === 'function') {
+        window.analyze(); // This calls your existing function
+      } else {
+        showError('Analysis function not found');
+      }
+    }
+
+    // This function will be called by your backend when results are ready
+    function displayResults(data) {
+      if (data.error) {
+        showError(data.error);
+        return;
+      }
+
+      let resultsHTML = `
+        <div class="results-container">
+          <div class="results-header">
+            <h2 class="results-title">Analysis Results</h2>
+            <div class="word-stats">
+              <div class="stat-box">
+                <i class="fas fa-font"></i>
+                <span>${data.totalWords || 0} total words</span>
+              </div>
+              <div class="stat-box">
+                <i class="fas fa-unique"></i>
+                <span>${data.uniqueWords || 0} unique words</span>
+              </div>
+            </div>
+          </div>
+          <div class="word-list">
+      `;
+
+      data.topWords.forEach(word => {
+        resultsHTML += `
+          <div class="word-card">
+            <div class="word-card-header">
+              <span class="word">${word.word}</span>
+              <span class="count">${word.count} occurrences</span>
+            </div>
+            <div class="word-card-body">
+              <div class="context-section">
+                <h4 class="context-title"><i class="fas fa-arrow-right"></i> Common Prefixes</h4>
+                <ul class="context-list">
+                  ${(word.prefixes || []).map(p => `<li>${p}</li>`).join('')}
+                </ul>
+              </div>
+              <div class="context-section">
+                <h4 class="context-title"><i class="fas fa-arrow-left"></i> Common Suffixes</h4>
+                <ul class="context-list">
+                  ${(word.suffixes || []).map(s => `<li>${s}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      resultsHTML += `
+          </div>
+        </div>
+      `;
+
+      document.getElementById('results').innerHTML = resultsHTML;
+    }
+
+    function showError(message) {
+      document.getElementById('results').innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>${message}</span>
+        </div>
+      `;
+    }
+
+    // Call this function when you want to add your logo and tool name
+    function setToolBranding(logoUrl, toolName) {
+      const logoContainer = document.getElementById('logoContainer');
+      const defaultHeader = document.getElementById('defaultHeader');
+      
+      if (logoUrl && toolName) {
+        document.getElementById('toolLogo').src = logoUrl;
+        document.getElementById('toolName').textContent = toolName;
+        logoContainer.style.display = 'flex';
+        defaultHeader.style.display = 'none';
+      } else {
+        logoContainer.style.display = 'none';
+        defaultHeader.style.display = 'block';
+      }
+    }
+  </script>
+  
+  <!-- Your existing script.js -->
   <script src="script.js"></script>
 </body>
 </html>
